@@ -1,0 +1,71 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <!--  Create table crops  -->
+    <changeSet id="1" author="your_name">
+        <createTable tableName="crops">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(150)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(150)"/>
+        </createTable>
+    </changeSet>
+
+    <!--  Create table farmers  -->
+    <changeSet id="2" author="your_name">
+        <createTable tableName="farmers">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(100)"/>
+            <column name="last_name" type="varchar(100)"/>
+        </createTable>
+    </changeSet>
+    <!--  Create table farms  -->
+    <changeSet id="3" author="your_name">
+        <createTable tableName="farms">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)"/>
+            <column name="location" type="varchar(100)"/>
+            <column name="farmer_id" type="INTEGER"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="farms" baseColumnNames="farmer_id" referencedTableName="farmers" referencedColumnNames="id" constraintName="fk_farmers_farm"/>
+    </changeSet>
+
+    <!--  Create table farm_crops  -->
+    <changeSet id="4" author="your_name">
+        <createTable tableName="farm_crops">
+            <column name="farm_id" type="INTEGER"/>
+            <column name="crop_id" type="INTEGER"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="farm_crops" baseColumnNames="farm_id" referencedTableName="farms" referencedColumnNames="id" constraintName="fk_farm"/>
+        <addForeignKeyConstraint baseTableName="farm_crops" baseColumnNames="crop_id" referencedTableName="crops" referencedColumnNames="id" constraintName="fk_crops"/>
+    </changeSet>
+
+    <!--  Insert data into crops table  -->
+    <changeSet id="5" author="your_name">
+        <insert tableName="crops">
+            <column name="name" value="CASHEW"/>
+            <column name="description" value="cashew crops"/>
+        </insert>
+        <insert tableName="crops">
+            <column name="name" value="SPINACH"/>
+            <column name="description" value="spinach crops"/>
+        </insert>
+        <insert tableName="crops">
+            <column name="name" value="CORN"/>
+            <column name="description" value="corn crops"/>
+        </insert>
+        <insert tableName="crops">
+            <column name="name" value="POTATOE"/>
+            <column name="description" value="potatoe crops"/>
+        </insert>
+        <insert tableName="crops">
+            <column name="name" value="YAM"/>
+            <column name="description" value="yam crops"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

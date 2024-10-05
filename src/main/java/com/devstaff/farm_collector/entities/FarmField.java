@@ -19,7 +19,9 @@ public class FarmField extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Season season;
 
-    private String cropType;
+    @ManyToOne
+    @JoinColumn(name = "crop_id", referencedColumnName = "id", nullable = false)
+    private Crops crop;
 
     private long amountOfProductExpectedInTons;
 

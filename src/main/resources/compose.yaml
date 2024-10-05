@@ -1,0 +1,23 @@
+version: '3.2'
+
+services:
+  postgres:
+    container_name: farm-collector-db
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: farmcollector
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-d", "DEV_DB", "-U", "DEV_DB", "-t", "1"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - postgres_data:/data/db
+
+volumes:
+  postgres_data:
+    driver: local
