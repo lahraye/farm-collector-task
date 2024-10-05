@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "farmer")
+@Table(name = "farmers")
 public class Farmer extends BaseEntity{
     private String name;
 }

@@ -1,8 +1,10 @@
 package com.devstaff.farm_collector.entities;
 
 
-import com.devstaff.farm_collector.constants.Season;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Data
@@ -11,23 +13,11 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "farm_field")
+@Table(name = "farm_fields")
 public class FarmField extends BaseEntity{
-    @Column(name = "field_name")
-    private String fieldName;
-
-    @Enumerated(EnumType.STRING)
-    private Season season;
+    private String name;
 
     @ManyToOne
-    @JoinColumn(name = "crop_id", referencedColumnName = "id", nullable = false)
-    private Crops crop;
-
-    private long amountOfProductExpectedInTons;
-
-    private long actualAmountOfProductHarvestedInTons;
-
-    @OneToOne
     @JoinColumn(referencedColumnName = "id", name = "farm_id", nullable = false)
     private Farm farm;
 }

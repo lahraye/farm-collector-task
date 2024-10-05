@@ -1,10 +1,7 @@
 package com.devstaff.farm_collector.entities;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Data
@@ -13,11 +10,11 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "farm")
+@Table(name = "farms")
 public class Farm extends BaseEntity{
     private String name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(referencedColumnName = "id", name = "farmer_id", nullable = false)
     private Farmer farmer;
 }

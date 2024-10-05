@@ -3,21 +3,27 @@ package com.devstaff.farm_collector.exceptions.advice;
 import com.devstaff.farm_collector.constants.ResponseCode;
 import com.devstaff.farm_collector.exceptions.CustomException;
 import com.devstaff.farm_collector.exceptions.NotFoundException;
+import com.devstaff.farm_collector.models.BaseError;
 import com.devstaff.farm_collector.models.BaseResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -104,6 +110,35 @@ public class ApiExceptionAdvice {
             responseMessage = constraintViolationOptional.get().getMessageTemplate();
         }
         response.setResponseMessage(responseMessage);
+        return response;
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse handleValidationException(MethodArgumentNotValidException e) {
+        return getBindingExceptions(e.getBindingResult());
+    }
+
+    private BaseResponse getBindingExceptions(BindingResult result) {
+        var response = new BaseResponse(ResponseCode.BAD_REQUEST);
+        List<FieldError> errorList = result.getFieldErrors();
+        List<BaseError> errors = new ArrayList<>();
+        for (FieldError fieldError : errorList) {
+            errors.add(
+                    new BaseError(
+                            fieldError.getField(),
+                            fieldError.isBindingFailure()
+                                    ? "Invalid data"
+                                    : fieldError.getDefaultMessage()));
+        }
+
+        if (!errors.isEmpty()) {
+            var responseMessage =
+                    String.format(
+                            String.format("%s: %s", errors.get(0).getFieldName(), errors.get(0).getMessage()));
+            response.setResponseMessage(responseMessage);
+        }
+
         return response;
     }
 }

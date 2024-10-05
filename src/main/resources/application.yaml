@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: farm-collector-task
+
+  liquibase:
+    change-log: classpath:db/changelog/liquibase-change.xml
+
+  datasource:
+    url: ${FARMCOLLECTOR_SERVICE_DATASOURCE_URL:jdbc:postgresql://localhost:5432/farmcollector}
+    username: ${FARMCOLLECTOR_SERVICE_DATASOURCE_USERNAME:postgres}
+    password: ${FARMCOLLECTOR_SERVICE_DATASOURCE_PASSWORD:postgres}
