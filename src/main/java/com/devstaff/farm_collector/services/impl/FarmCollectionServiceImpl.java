@@ -3,6 +3,7 @@ package com.devstaff.farm_collector.services.impl;
 import com.devstaff.farm_collector.entities.Crop;
 import com.devstaff.farm_collector.entities.FarmField;
 import com.devstaff.farm_collector.entities.FieldOperation;
+import com.devstaff.farm_collector.exceptions.CustomException;
 import com.devstaff.farm_collector.exceptions.NotFoundException;
 import com.devstaff.farm_collector.models.CropFarmingDetails;
 import com.devstaff.farm_collector.models.FarmFieldDetail;
@@ -39,28 +40,43 @@ public class FarmCollectionServiceImpl implements FarmCollectionService  {
     @Override
     @Transactional
     public FarmDetailResponse processFarmInfo(FarmDetailRequest request) {
-        var farmField = farmFieldRepository.findById(request.getFarmFieldId()).orElseThrow((() -> new NotFoundException("Farm field not found")));
-
+        Long farmFieldId = request.getFarmFieldId();
+        int year = request.getYear();
         var farmDetail = request.getFarmFieldDetails();
-        setCropDetails(farmDetail);
+
+        var farmField = farmFieldRepository.findById(farmFieldId).orElseThrow((() -> new NotFoundException("Farm field not found")));
+
+        List<Long> cropIds = setCropDetails(farmDetail);
+        validateRequestIsUnique(cropIds, farmFieldId, year);
+
 
         //group by crop
         var farmDetailsByCrop =  farmDetail.stream().collect(
                 Collectors.groupingBy(FarmFieldDetail::getCrop,
                 Collectors.flatMapping(x -> x.getCropFarmingDetails().stream(), Collectors.toList())));
 
-        List<FieldOperation> fieldOperationRecordsToPersist = buildFarmFieldRecords(farmField, request.getYear(), farmDetailsByCrop);
+        List<FieldOperation> fieldOperationRecordsToPersist = buildFarmFieldRecords(farmField, year, farmDetailsByCrop);
 
         fieldOperationRepository.saveAll(fieldOperationRecordsToPersist);
 
         return FarmDetailResponse.builder().farmId(farmField.getFarm().getId()).farmFieldId(farmField.getId()).build();
     }
 
-    private void setCropDetails(Set<FarmFieldDetail> farmDetail) {
-        for( FarmFieldDetail fd : farmDetail){
+    private void validateRequestIsUnique(List<Long> cropIds, Long farmFieldId, int year) {
+        boolean recordExists = fieldOperationRepository.existsByFarmFieldIdAndCropIdInAndYear(farmFieldId, cropIds, year);
+
+        if(recordExists){
+            throw new CustomException("A record exists already for 1 or more crops in your request");
+        }
+    }
+
+    private List<Long> setCropDetails(Set<FarmFieldDetail> farmDetail) {
+        return farmDetail.stream().map(fd -> {
             Crop crop = cropRepository.findById(fd.getCropId()).orElseThrow(() -> new NotFoundException(String.format("Crop with ID %s not found", fd.getCropId())));
             fd.setCrop(crop);
-        }
+            return crop;
+        }).map(Crop::getId).collect(Collectors.toList());
+
     }
 
     private List<FieldOperation> buildFarmFieldRecords(FarmField farmField, int year, Map<Crop, List<CropFarmingDetails>> cropFarmingDetails) {
