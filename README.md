@@ -40,14 +40,48 @@ To run the app, do the following:
 - run `docker compose up`
 
 ### Testing Locally ###
-The code contains a [api-docs.yml](./api-docs.yaml) to test locally. you can also visit [swagger page](http://localhost:8080/swagger-ui.html)
+The code contains a [api-docs.json](./api-docs.json) to test locally. you can also visit [swagger page](http://localhost:8080/swagger-ui.html)
 
 
 ### Sample API Requests ###
-#### Postman URL
 
+##### Operation: Collect Information from Farmer #####
 ```
-Operation: Collect Information from Farmer
+URL: localhost:8080/api/v1/farm-collections
+Method: POST
+Request Payload:
+
+{
+    "farmFieldId": 1,
+    "year": 2024,
+    "farmFieldDetails": [
+        {
+            "cropId": 1,
+            "cropFarmingDetails": [
+                {
+                    "season": "SPRING",
+                    "plantingAreaInAcres": 10,
+                    "amountOfExpectedProduct": 12.0
+                },
+                {
+                    "season": "FALL",
+                    "actualAmountOfProductHarvested": 10.0
+                }
+            ]
+        }
+    ]
+}
+
+Response Payload: 
+{
+    "farmId": 1,
+    "farmFieldId": 1
+}
+```
+
+
+##### Operation: Collect Information from Farmer #####
+```
 URL: localhost:8080/api/v1/farm-collections
 Method: POST
 Request Payload:
@@ -79,7 +113,6 @@ Response Payload:
     "farmFieldId": 1
 }
 
-```
 ### Who do I talk to? ###
 
 * [Showemimo Olarewaju](lahraye@gmail.com)

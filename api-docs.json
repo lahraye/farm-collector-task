@@ -1,0 +1,286 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Farmer Collection API",
+    "description": "Farmer Collection API documentation",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/v1/farm-collections": {
+      "post": {
+        "tags": [
+          "farm-collection-controller"
+        ],
+        "operationId": "collectFarmDetails",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmDetailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "tags": [
+          "farm-report-controller"
+        ],
+        "operationId": "getFarmReportDetails",
+        "parameters": [
+          {
+            "name": "farmId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "crops",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FarmReportDetails"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseResponse": {
+        "type": "object",
+        "properties": {
+          "responseMessage": {
+            "type": "string"
+          },
+          "responseCode": {
+            "type": "string"
+          }
+        }
+      },
+      "CropFarmingDetails": {
+        "required": [
+          "season"
+        ],
+        "type": "object",
+        "properties": {
+          "season": {
+            "type": "string",
+            "enum": [
+              "SPRING",
+              "FALL"
+            ]
+          },
+          "plantingAreaInAcres": {
+            "type": "number",
+            "format": "double"
+          },
+          "amountOfExpectedProduct": {
+            "type": "number",
+            "format": "double"
+          },
+          "actualAmountOfProductHarvested": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "FarmDetailRequest": {
+        "required": [
+          "farmFieldDetails",
+          "farmFieldId"
+        ],
+        "type": "object",
+        "properties": {
+          "farmFieldId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "year": {
+            "minimum": 1999,
+            "type": "integer",
+            "format": "int32"
+          },
+          "farmFieldDetails": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FarmFieldDetail"
+            }
+          }
+        }
+      },
+      "FarmFieldDetail": {
+        "required": [
+          "cropId"
+        ],
+        "type": "object",
+        "properties": {
+          "cropId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cropFarmingDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CropFarmingDetails"
+            }
+          }
+        }
+      },
+      "FarmDetailResponse": {
+        "type": "object",
+        "properties": {
+          "farmId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "farmFieldId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "FarmReportDetails": {
+        "type": "object",
+        "properties": {
+          "farmName": {
+            "type": "string"
+          },
+          "cropName": {
+            "type": "string"
+          },
+          "plantingAreaSize": {
+            "type": "number",
+            "format": "double"
+          },
+          "amountExpected": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amountHarvested": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}
